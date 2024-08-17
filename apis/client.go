@@ -41,6 +41,7 @@ func (w *WvpApi) GetDeviceList(ctx context.Context, page, pageSize string) (WvpD
 		"page":  page,
 		"count": pageSize,
 	})
+	logrus.Debug(resp, err)
 	var result WvpDeviceListRes
 	if err != nil {
 		return result, err
@@ -49,6 +50,7 @@ func (w *WvpApi) GetDeviceList(ctx context.Context, page, pageSize string) (WvpD
 	if err != nil {
 		return result, err
 	}
+	logrus.Debug(result, err)
 	return result, nil
 }
 
