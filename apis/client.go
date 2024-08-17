@@ -102,7 +102,7 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 	url := fmt.Sprintf("/api/device/query/devices/%s/channels", deviceId)
 	var (
 		ret    DeviceChannelsRes
-		result = make(map[string]interface{})
+		result map[string]interface{}
 	)
 	resp, err := w.get(ctx, url, map[string]interface{}{
 		"page":  1,
