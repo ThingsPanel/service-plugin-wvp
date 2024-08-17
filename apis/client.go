@@ -119,6 +119,10 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 		if v.StreamId != nil && *v.StreamId != "" {
 			result = w.getPlayURLs(v.DeviceId, v.ChannelId)
 		}
+		if result == nil {
+			result = w.getPlayURLs(v.DeviceId, v.ChannelId)
+			break
+		}
 	}
 	return result, nil
 }
