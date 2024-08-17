@@ -18,7 +18,7 @@ func RedisInit() {
 	})
 }
 
-func SetWvpConfig(ctx context.Context, config model.WvpForm) error {
+func SetWvpConfig(ctx context.Context, config *model.WvpForm) error {
 	redisKey := "wvpConfigRedisCacheKey"
 	configRedisKey := fmt.Sprintf("%s:%d", config.Server, config.Port)
 	REDIS.SAdd(ctx, redisKey, configRedisKey)

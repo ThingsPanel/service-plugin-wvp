@@ -143,7 +143,7 @@ func OnGetDeviceList(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		ctx := context.Background()
-		err = cache.SetWvpConfig(context.Background(), voucher)
+		err = cache.SetWvpConfig(context.Background(), &voucher)
 		if err != nil {
 			logrus.Debug(err)
 		}
