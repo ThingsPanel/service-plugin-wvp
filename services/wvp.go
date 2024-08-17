@@ -56,7 +56,8 @@ func (w *WvpService) mqttPublish(ctx context.Context, config model.WvpForm) {
 				logrus.Debug(err2)
 				continue
 			}
-			err = mqtt.PublishTelemetry(deviceInfo.Data.ID, payload)
+			//err = mqtt.PublishTelemetry(deviceInfo.Data.ID, payload)
+			err = mqtt.PublishAttributes(deviceInfo.Data.ID, payload)
 			if err != nil {
 				logrus.Debug(err)
 			}
