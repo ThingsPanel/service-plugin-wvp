@@ -1,0 +1,36 @@
+[
+  {
+    "dataKey": "server",
+    "label": "服务地址",
+    "placeholder": "请输入服务地址，例如:104.156.140.42,不需要http|https",
+    "type": "input",
+    "validate": {
+      "message": "不能为空",
+      "required": true,
+      "type": "string"
+    }
+  },
+  {
+    "dataKey": "port",
+    "label": "端口",
+    "placeholder": "请输入端口",
+    "type": "input",
+    "validate": {
+      "message": "不能为空",
+      "required": true,
+      "type": "string"
+    }
+  },
+  {
+    "dataKey": "apiToken",
+    "label": "应用apikey",
+    "placeholder": "请输入应用apikey",
+    "type": "input",
+    "validate": {
+      "message": "不能为空",
+      "required": true,
+      "type": "string"
+    }
+  }
+]
+
