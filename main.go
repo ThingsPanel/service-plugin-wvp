@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"plugin_wvp/cache"
-	"plugin_wvp/cmd"
+	"plugin_wvp/cmd_cron"
 	httpclient "plugin_wvp/http_client"
 	httpservice "plugin_wvp/http_service"
 	"plugin_wvp/mqtt"
@@ -31,7 +31,7 @@ func main() {
 	// 启动http服务
 	httpservice.Init()
 	//定时任务
-	cmd.StartInit()
+	cmd_cron.StartInit()
 	select {}
 }
 func conf() {
