@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"plugin_wvp/apis"
+	"plugin_wvp/cache"
 	httpclient "plugin_wvp/http_client"
 	"plugin_wvp/model"
 )
@@ -99,13 +100,6 @@ func readFormConfigByPath(path string) interface{} {
 	}
 }
 
-type CwtingVoucher struct {
-	ProductId string `json:"productId"`
-	AppKey    string `json:"appKey"`
-	AppSecret string `json:"AppSecret"`
-	MasterKey string `json:"MasterKey"`
-}
-
 func OnGetDeviceList(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("OnGetDeviceList")
 	//r.ParseForm() //解析参数，默认是不会解析的
@@ -145,7 +139,21 @@ func OnGetDeviceList(w http.ResponseWriter, r *http.Request) {
 	}
 	data["total"] = result.Data.Total
 	data["list"] = list
-	// 获取设备列表
+	// 添加缓存
+
+	go func() {
+		ctx := context.Background()
+		err = cache.SetWvpConfig(context.Background(), voucher)
+		if err != nil {
+			logrus.Debug(err)
+		}
+		keys, err := cache.GetWvpConfigKey(ctx)
+		logrus.Debug(keys, err)
+		for _, v := range keys {
+			con, err := cache.GetWvpConfig(ctx, v)
+			logrus.Debug(con, err)
+		}
+	}()
 	RspSuccess(w, data)
 }
 
