@@ -114,6 +114,7 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 		logrus.Debug(ret)
 		return result, nil
 	}
+	logrus.Debug(ret)
 	for _, v := range ret.Data.List {
 		if v.StreamId != nil && *v.StreamId != "" {
 			result = w.getPlayURLs(v.DeviceId, v.ChannelId)
