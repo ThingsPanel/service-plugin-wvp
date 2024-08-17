@@ -3,19 +3,15 @@ module plugin_wvp
 go 1.22
 
 require (
-	github.com/chirpstack/chirpstack/api/go/v4 v4.8.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.19.0
-	google.golang.org/grpc v1.62.1
 )
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240325203815-454cdb8f5daa // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240325203815-454cdb8f5daa // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 )
 
 require (

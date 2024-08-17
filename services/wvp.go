@@ -1,83 +1,70 @@
 package services
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"io"
-	"net/http"
+	"golang.org/x/net/context"
+	"plugin_wvp/apis"
+	"plugin_wvp/cache"
 	httpclient "plugin_wvp/http_client"
+	"plugin_wvp/model"
 	"plugin_wvp/mqtt"
 )
 
-type ChirpStackService struct {
-	mux *http.ServeMux
+type WvpService struct {
 }
 
-func NewChirpStack() *ChirpStackService {
-	return &ChirpStackService{
-		mux: http.NewServeMux(),
-	}
+func NewWvpService() *WvpService {
+	return &WvpService{}
 }
 
-func (ctw *ChirpStackService) Init() *http.ServeMux {
-	ctw.mux.HandleFunc("/accept/telemetry", ctw.telemetry)
-	return ctw.mux
-}
-
-func (ctw *ChirpStackService) telemetry(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(r.Body)
-	var msg ChirpStackMessage
-	err := decoder.Decode(&msg)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	logrus.Debug("telemetry:", msg)
-	if msg.Data == "" {
-		return
-	}
-	deviceNumber := fmt.Sprintf(viper.GetString("chirp_stack.device_number_key"), msg.DeviceInfo.DevEui)
-	//deviceNumber := msg.DeviceInfo.DevEui
-	// 读取设备信息
-	deviceInfo, err := httpclient.GetDeviceConfig(deviceNumber)
-	if err != nil || deviceInfo.Code != 200 {
-		// 获取设备信息失败，请检查连接包是否正确
-		logrus.Error(err)
-		return
-	}
-	logrus.Debug("deviceInfo:", deviceInfo)
-	payload, err := base64.StdEncoding.DecodeString(msg.Data)
-	if err != nil {
-		//base64解密失败
-		logrus.Error(err)
-		return
-	}
-	telemetry := make(map[string]interface{})
-	err = json.Unmarshal(payload, &telemetry)
-	if err != nil {
-		// 数据客户转换失败
-		logrus.Error(err)
-		return
-	}
-	logrus.Debug("telemetry:", telemetry)
-	err = mqtt.PublishTelemetry(deviceInfo.Data.ID, telemetry)
-	if err != nil {
-		logrus.Error(err)
+func (w *WvpService) DeviceMqttPublish() {
+	ctx := context.Background()
+	keys, err := cache.GetWvpConfigKey(ctx)
+	logrus.Debug(keys, err)
+	for _, v := range keys {
+		con, err2 := cache.GetWvpConfig(ctx, v)
+		if err2 != nil {
+			continue
+		}
+		w.mqttPublish(ctx, con)
+		logrus.Debug(con, err)
 	}
 }
 
-type ChirpStackMessage struct {
-	DeviceInfo ChirpStackDeviceInfo `json:"deviceInfo"`
-	Data       string               `json:"data"`
-}
-
-type ChirpStackDeviceInfo struct {
-	DevEui        string `json:"devEui"`
-	ApplicationId string `json:"applicationId"`
+func (w *WvpService) mqttPublish(ctx context.Context, config model.WvpForm) {
+	api := apis.NewWvpApi(config)
+	resp, err := api.GetDeviceList(ctx, "1", "100")
+	if err != nil || resp.Code != 0 {
+		return
+	}
+	for _, v := range resp.Data.List {
+		deviceNumber := fmt.Sprintf(viper.GetString("wvp.device_number_key"), v.DeviceId)
+		// 读取设备信息
+		deviceInfo, err1 := httpclient.GetDeviceConfig(deviceNumber)
+		if err1 != nil || deviceInfo.Code != 200 || deviceInfo.Data.ID == "" {
+			continue
+		}
+		if v.OnLine {
+			err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 1)
+			if err != nil {
+				logrus.Debug(err)
+			}
+			payload, err2 := api.GetDeviceChannels(ctx, v.DeviceId)
+			if err != nil {
+				logrus.Debug(err2)
+				continue
+			}
+			err = mqtt.PublishTelemetry(deviceInfo.Data.ID, payload)
+			if err != nil {
+				logrus.Debug(err)
+			}
+		} else {
+			err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 0)
+			if err != nil {
+				logrus.Debug(err)
+			}
+		}
+	}
 }

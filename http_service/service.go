@@ -143,15 +143,9 @@ func OnGetDeviceList(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		ctx := context.Background()
-		err = cache.SetWvpConfig(context.Background(), &voucher)
+		err = cache.SetWvpConfig(ctx, &voucher)
 		if err != nil {
 			logrus.Debug(err)
-		}
-		keys, err := cache.GetWvpConfigKey(ctx)
-		logrus.Debug(keys, err)
-		for _, v := range keys {
-			con, err := cache.GetWvpConfig(ctx, v)
-			logrus.Debug(con, err)
 		}
 	}()
 	RspSuccess(w, data)

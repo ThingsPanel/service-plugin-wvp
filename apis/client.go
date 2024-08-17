@@ -98,11 +98,11 @@ type DeviceChannelsRes struct {
 	} `json:"data"`
 }
 
-func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[string]string, error) {
+func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[string]interface{}, error) {
 	url := fmt.Sprintf("/api/device/query/devices/%s/channels", deviceId)
 	var (
 		ret    DeviceChannelsRes
-		result = make(map[string]string)
+		result = make(map[string]interface{})
 	)
 	resp, err := w.get(ctx, url, map[string]interface{}{
 		"page":  1,
@@ -122,9 +122,9 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 	return result, nil
 }
 
-func (w *WvpApi) getPlayURLs(deviceID, channelID string) map[string]string {
+func (w *WvpApi) getPlayURLs(deviceID, channelID string) map[string]interface{} {
 	stream := fmt.Sprintf("%s_%s", deviceID, channelID)
-	return map[string]string{
+	return map[string]interface{}{
 		"FLV":         fmt.Sprintf("http://%s:18001/rtp/%s.live.flv", w.Config.Server, stream),
 		"FLV(ws)":     fmt.Sprintf("ws://%s:18001/rtp/%s.live.flv", w.Config.Server, stream),
 		"FMP4":        fmt.Sprintf("http://%s:18001/rtp/%s.live.mp4", w.Config.Server, stream),
