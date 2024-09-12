@@ -94,6 +94,7 @@ type DeviceChannelsRes struct {
 			ChannelId string  `json:"channelId"`
 			DeviceId  string  `json:"deviceId"`
 			StreamId  *string `json:"streamId"`
+			Port      int     `json:"port"`
 		} `json:"list"`
 	} `json:"data"`
 }
@@ -117,17 +118,17 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 	logrus.Debug(ret)
 	for _, v := range ret.Data.List {
 		if v.StreamId != nil && *v.StreamId != "" {
-			result = w.getPlayURLs(v.DeviceId, v.ChannelId)
+			result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
 		}
 		if result == nil {
-			result = w.getPlayURLs(v.DeviceId, v.ChannelId)
+			result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
 			break
 		}
 	}
 	return result, nil
 }
 
-func (w *WvpApi) getPlayURLs(deviceID, channelID string) map[string]interface{} {
+func (w *WvpApi) getPlayURLs(deviceID, channelID string, port int) map[string]interface{} {
 	stream := fmt.Sprintf("%s_%s", deviceID, channelID)
 	return map[string]interface{}{
 		"FLV":         fmt.Sprintf("http://%s:18001/rtp/%s.live.flv", w.Config.Server, stream),
