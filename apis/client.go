@@ -110,6 +110,7 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 		"count": 20,
 		//"online": true,
 	})
+	logrus.Debug("resp:", resp)
 	err = json.Unmarshal([]byte(resp), &ret)
 	if err != nil {
 		logrus.Debug(ret)
