@@ -46,26 +46,26 @@ func (w *WvpService) mqttPublish(ctx context.Context, config model.WvpForm) {
 		if err1 != nil || deviceInfo.Code != 200 || deviceInfo.Data.ID == "" {
 			continue
 		}
-		//if v.OnLine {
-		err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 1)
-		if err != nil {
-			logrus.Debug(err)
+		if v.OnLine {
+			err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 1)
+			if err != nil {
+				logrus.Debug(err)
+			}
+			payload, err2 := api.GetDeviceChannels(ctx, v.DeviceId)
+			if err != nil {
+				logrus.Debug(err2)
+				continue
+			}
+			//err = mqtt.PublishTelemetry(deviceInfo.Data.ID, payload)
+			err = mqtt.PublishAttributes(deviceInfo.Data.ID, payload)
+			if err != nil {
+				logrus.Debug(err)
+			}
+		} else {
+			err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 0)
+			if err != nil {
+				logrus.Debug(err)
+			}
 		}
-		payload, err2 := api.GetDeviceChannels(ctx, v.DeviceId)
-		if err != nil {
-			logrus.Debug(err2)
-			continue
-		}
-		//err = mqtt.PublishTelemetry(deviceInfo.Data.ID, payload)
-		err = mqtt.PublishAttributes(deviceInfo.Data.ID, payload)
-		if err != nil {
-			logrus.Debug(err)
-		}
-		//} else {
-		//	err = mqtt.DeviceStatusUpdate(deviceInfo.Data.ID, 0)
-		//	if err != nil {
-		//		logrus.Debug(err)
-		//	}
-		//}
 	}
 }
