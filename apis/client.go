@@ -118,6 +118,7 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 	}
 	logrus.Debug(ret)
 	for _, v := range ret.Data.List {
+		logrus.Debug("GetPlayStartURLs", w.GetPlayStartURLs(ctx, v.DeviceId, v.ChannelId))
 		if v.StreamId != nil && *v.StreamId != "" {
 			result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
 		}
@@ -127,6 +128,28 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 		}
 	}
 	return result, nil
+}
+
+type PlayStartURLsRes struct {
+	Code int                    `json:"code"`
+	Msg  string                 `json:"msg"`
+	Data map[string]interface{} `json:"data"`
+}
+
+func (w *WvpApi) GetPlayStartURLs(ctx context.Context, deviceID, channelID string) map[string]interface{} {
+	url := fmt.Sprintf("/api/play/start/%s/%s", deviceID, channelID)
+	var (
+		ret    PlayStartURLsRes
+		result map[string]interface{}
+	)
+	resp, err := w.get(ctx, url, nil)
+	err = json.Unmarshal([]byte(resp), &ret)
+	if err != nil {
+		logrus.Debug(ret)
+		return result
+	}
+
+	return ret.Data
 }
 
 func (w *WvpApi) getPlayURLs(deviceID, channelID string, port int) map[string]interface{} {
