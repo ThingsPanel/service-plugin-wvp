@@ -118,12 +118,16 @@ func (w *WvpApi) GetDeviceChannels(ctx context.Context, deviceId string) (map[st
 	}
 	logrus.Debug(ret)
 	for _, v := range ret.Data.List {
-		logrus.Debug("GetPlayStartURLs", w.GetPlayStartURLs(ctx, v.DeviceId, v.ChannelId))
-		if v.StreamId != nil && *v.StreamId != "" {
-			result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
-		}
-		if result == nil {
-			result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
+		//logrus.Debug("GetPlayStartURLs", w.GetPlayStartURLs(ctx, v.DeviceId, v.ChannelId))
+		//if v.StreamId != nil && *v.StreamId != "" {
+		//	result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
+		//}
+		//if result == nil {
+		//	result = w.getPlayURLs(v.DeviceId, v.ChannelId, v.Port)
+		//	break
+		//}
+		result = w.GetPlayStartURLs(ctx, v.DeviceId, v.ChannelId)
+		if result != nil {
 			break
 		}
 	}
