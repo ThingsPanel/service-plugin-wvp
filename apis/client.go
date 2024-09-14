@@ -149,6 +149,7 @@ func (w *WvpApi) GetPlayStartURLs(ctx context.Context, deviceID, channelID strin
 		logrus.Debug(ret)
 		return result
 	}
+	logrus.Debug("resp.Data", ret.Data)
 	for k, v := range ret.Data {
 		if val, ok := v.(string); ok {
 			result[k] = val
