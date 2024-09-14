@@ -140,7 +140,7 @@ func (w *WvpApi) GetPlayStartURLs(ctx context.Context, deviceID, channelID strin
 	url := fmt.Sprintf("/api/play/start/%s/%s", deviceID, channelID)
 	var (
 		ret    PlayStartURLsRes
-		result map[string]interface{}
+		result = make(map[string]interface{})
 		//keys   = []string{"flv", "fpm4", "hls", "https_flv"}
 	)
 	resp, err := w.get(ctx, url, nil)
