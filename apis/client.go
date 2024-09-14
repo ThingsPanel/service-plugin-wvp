@@ -141,15 +141,20 @@ func (w *WvpApi) GetPlayStartURLs(ctx context.Context, deviceID, channelID strin
 	var (
 		ret    PlayStartURLsRes
 		result map[string]interface{}
+		//keys   = []string{"flv", "fpm4", "hls", "https_flv"}
 	)
 	resp, err := w.get(ctx, url, nil)
 	err = json.Unmarshal([]byte(resp), &ret)
-	if err != nil {
+	if err != nil || ret.Code != 0 {
 		logrus.Debug(ret)
 		return result
 	}
-
-	return ret.Data
+	for k, v := range ret.Data {
+		if val, ok := v.(string); ok {
+			result[k] = val
+		}
+	}
+	return result
 }
 
 func (w *WvpApi) getPlayURLs(deviceID, channelID string, port int) map[string]interface{} {
